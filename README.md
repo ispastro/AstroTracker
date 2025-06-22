@@ -24,7 +24,7 @@ AstroTracker is a full-stack web application built with Laravel + Inertia.js + V
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/astrotracker.git
+git clone https://github.com/ispastro/Astrotracker.git
 ```
 
 2. Install dependencies:
