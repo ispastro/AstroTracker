@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
@@ -42,9 +43,21 @@ class User extends Authenticatable
         return $this->hasMany(EventSubscription::class);
     }
 
-    public function subscribedEvents(): HasMany
+    public function createdEvents(): HasMany
     {
-        return $this->hasManyThrough(CelestialEvent::class, EventSubscription::class);
+        return $this->hasMany(CelestialEvent::class);
+    }
+
+    public function subscribedEvents(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            CelestialEvent::class, 
+            EventSubscription::class,
+            'user_id', // foreign key in subscriptions table
+            'id',     // local key in events table
+            'id',     // local key in users table
+            'celestial_event_id' // foreign key in subscriptions table
+        );
     }
 
     public function roles(): BelongsToMany
@@ -55,10 +68,5 @@ class User extends Authenticatable
     public function hasRole(string $role): bool
     {
         return $this->roles()->where('name', $role)->exists();
-    }
-
-    public function events(): HasMany
-    {
-        return $this->hasMany(CelestialEvent::class);
     }
 }

@@ -27,13 +27,25 @@ class CelestialEventController extends Controller
 
     public function create()
     {
-        return Inertia::render('CelestialEvents/Create');
+        return Inertia::render('CelestialEvents/Create', [
+            'eventTypes' => ['meteor_shower', 'eclipse', 'planet', 'satellite', 'comet', 'asteroid'],
+            'regions' => ['Africa', 'Antarctica', 'Asia', 'Europe', 'North America', 'Oceania', 'South America']
+        ]);
     }
 
     public function store(CelestialEventRequest $request)
     {
-        $event = CelestialEvent::create($request->validated());
-        return redirect()->route('celestial-events.index');
+        $validated = $request->validated();
+        
+        // Convert visibility_regions to array if it's a string
+        if (isset($validated['visibility_regions']) && is_string($validated['visibility_regions'])) {
+            $validated['visibility_regions'] = explode(',', $validated['visibility_regions']);
+        }
+
+        $event = CelestialEvent::create($validated);
+        
+        return redirect()->route('celestial-events.index')
+            ->with('success', 'Event created successfully');
     }
 
     public function edit(CelestialEvent $event)

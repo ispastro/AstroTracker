@@ -152,14 +152,36 @@ const eventTypes = ref([
 const form = useForm({
   title: '',
   description: '',
-  type: 'meteor_shower',
-  starts_at: new Date().toISOString().slice(0, 16),
-  ends_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
+  type: '',
+  starts_at: new Date().toISOString().split('T')[0],
+  ends_at: new Date().toISOString().split('T')[0],
   visibility_regions: '',
   is_global: false
 })
 
 const submit = () => {
-  form.post(route('admin.events.store'))
+  form.post(route('celestial-events.store'), {
+    preserveScroll: true,
+    onSuccess: () => {
+      form.reset()
+    },
+    onError: () => {
+      if (form.errors.title) {
+        form.reset('title')
+      }
+      if (form.errors.description) {
+        form.reset('description')
+      }
+      if (form.errors.type) {
+        form.reset('type')
+      }
+      if (form.errors.starts_at) {
+        form.reset('starts_at')
+      }
+      if (form.errors.ends_at) {
+        form.reset('ends_at')
+      }
+    }
+  })
 }
 </script>

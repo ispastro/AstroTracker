@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\User;
 
 class CelestialEvent extends Model
 {
@@ -28,6 +29,11 @@ class CelestialEvent extends Model
     public function subscriptions(): HasMany
     {
         return $this->hasMany(EventSubscription::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function isVisibleToUser(User $user): bool

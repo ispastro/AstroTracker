@@ -1,16 +1,19 @@
 <template>
-  <div>
-    <Head title="Celestial Events" />
+  <AuthenticatedLayout>
+    <template #header>
+      <h2 class="text-xl font-semibold leading-tight text-gray-800">
+        Celestial Events
+      </h2>
+    </template>
 
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-          <div class="p-6 text-gray-900">
+          <div class="p-6">
             <div class="flex justify-between items-center mb-6">
               <h1 class="text-2xl font-bold">Celestial Events</h1>
               <Link
-                v-if="can('create events')"
-                :href="route('admin.events.create')"
+                :href="route('celestial-events.create')"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Create Event
@@ -61,54 +64,51 @@
             </div>
 
             <!-- Events List -->
-            <div class="space-y-4">
-              <EventCard
-                v-for="event in events"
-                :key="event.id"
-                :event="event"
-                :is-subscribed="event.is_subscribed"
-                :can-subscribe="true"
-              />
+            <div v-if="events.data.length > 0" class="space-y-4">
+              <EventCard v-for="event in events.data" :key="event.id" :event="event" />
+            </div>
+
+            <!-- Empty State -->
+            <div v-else class="text-center py-8">
+              <p class="text-gray-500">No events found matching your criteria.</p>
             </div>
 
             <!-- Pagination -->
-            <div class="mt-6">
+            <div v-if="events.data.length > 0" class="mt-6">
               <Pagination :links="events.links" />
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </AuthenticatedLayout>
 </template>
 
 <script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link } from '@inertiajs/vue3'
 import EventCard from '@/Components/EventCard.vue'
 import Pagination from '@/Components/Pagination.vue'
-import { computed, ref } from 'vue'
 
 const props = defineProps({
   events: Object,
-  filters: Object,
-  can: Object
+  filters: Object
 })
 
-const eventTypes = ref([
+const eventTypes = [
   'meteor_shower',
   'eclipse',
   'planet',
   'satellite',
   'comet',
   'asteroid'
-])
+]
 
 const submit = () => {
-  Inertia.get(route('events.index'), {
-    ...props.filters,
-    type: props.filters.type,
-    start_date: props.filters.start_date,
-    end_date: props.filters.end_date
+  Inertia.get(route('celestial-events.index'), {
+    type: filters.type,
+    start_date: filters.start_date,
+    end_date: filters.end_date
   }, {
     preserveState: true,
     replace: true
